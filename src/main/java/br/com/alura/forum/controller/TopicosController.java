@@ -1,5 +1,6 @@
 package br.com.alura.forum.controller;
 
+
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -8,6 +9,9 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -38,12 +43,27 @@ public class TopicosController {
 	private CursoRepository cursoRepository;
 
 	@GetMapping
-	public List<TopicoDto> lista(String nomeCurso) {
+	public Page<TopicoDto> lista(@RequestParam(required = false) String nomeCurso, @RequestParam int pagina,
+			@RequestParam int qtd) {
+		/*
+		 * @reqparam, fazm com que seja obrigatório a sua irnserção, colocaremos em
+		 * todos os parâmetros para que assim o usuário seja obrigado a informar uma
+		 * página e a quantidade de topicos que quer ver, para que a nossa aplicação não
+		 * carregue tudo de uma vez, ficando mto pesada e lenta. No caso do nome do
+		 * CURSO é opcional, então atribuimos false no required.(por padrão é obrigatório)
+		 */
+
+		Pageable paginacao = PageRequest.of(pagina, qtd); // Responsável pela paginação.(Pageable)
+		// para cria-lo precisamos do pagequest, onde iremos passar a página e a quantidade.
+		
 		if (nomeCurso == null) {
-			List<Topico> topicos = topicoRepository.findAll();
+			// passando o nosso pageable como parametro o spring já destecta que vamos fazer uma páginação
+			// Trocamos o List por pageable, pois o list sempre irá devolve todos os topicos.
+			// Dentro de page, também tem a lista e também o n de pag, pag atual, elementos, etc.
+			Page<Topico> topicos = topicoRepository.findAll(paginacao);
 			return TopicoDto.converter(topicos);
 		} else {
-			List<Topico> topicos = topicoRepository.findByCursoNome(nomeCurso);
+			Page<Topico> topicos = topicoRepository.findByCursoNome(nomeCurso, paginacao);
 			return TopicoDto.converter(topicos);
 		}
 	}
@@ -68,23 +88,20 @@ public class TopicosController {
 		}
 
 		return ResponseEntity.notFound().build();
-
 	}
 
 	@PutMapping("/{id}")
-	@Transactional // avisa o spring para dispara o update no banco de dados, sem ela não é
-					// atualizado.
+	@Transactional
 	public ResponseEntity<TopicoDto> atualizar(@PathVariable Long id, @RequestBody @Valid AtualizacaoTopicoForm form) {
 
 		Optional<Topico> optional = topicoRepository.findById(id);
 		if (optional.isPresent()) {
 			Topico topico = form.atualizar(id, topicoRepository);
 			return ResponseEntity.ok(new TopicoDto(topico));
-			// O parâmetro do "ok" é o corpo que será devolvido como resposta pelo servidor.
+
 		}
 
 		return ResponseEntity.notFound().build();
-
 	}
 
 	@DeleteMapping("/{id}")
@@ -98,6 +115,5 @@ public class TopicosController {
 		}
 
 		return ResponseEntity.notFound().build();
-
 	}
 }
