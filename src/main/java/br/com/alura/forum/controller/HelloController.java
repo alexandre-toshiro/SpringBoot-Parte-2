@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class HelloController {
 
 	@RequestMapping("/")
-	@ResponseBody // Faz com que o retorno apareça na página, do contrário o SB irá interpretar o
-					// retorno como uma página e irá procurar a mesma no projeto..
+	@ResponseBody
 	public String helo() {
 		return "Hello World!!!";
 	}

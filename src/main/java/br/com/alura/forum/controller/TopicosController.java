@@ -27,8 +27,8 @@ import br.com.alura.forum.model.Topico;
 import br.com.alura.forum.repository.CursoRepository;
 import br.com.alura.forum.repository.TopicoRepository;
 
-@RestController // Para não repetir a anotação @Responsebody em todos os métodos.
-@RequestMapping("/topicos") // Todas as req de /topicos cairão nesse controller.
+@RestController
+@RequestMapping("/topicos")
 public class TopicosController {
 
 	@Autowired
@@ -37,8 +37,8 @@ public class TopicosController {
 	@Autowired
 	private CursoRepository cursoRepository;
 
-	@GetMapping // Nos método colocaremos apenas as notações com os verbos http.
-	public List<TopicoDto> lista(String nomeCurso) { // nome curso é recebido como parametro na url.
+	@GetMapping
+	public List<TopicoDto> lista(String nomeCurso) {
 		if (nomeCurso == null) {
 			List<Topico> topicos = topicoRepository.findAll();
 			return TopicoDto.converter(topicos);
@@ -48,11 +48,10 @@ public class TopicosController {
 		}
 	}
 
-	@PostMapping // @rebody Indica que é pra pegar do corpo da req e não do parâmetro de URL.
+	@PostMapping
 	@Transactional
 	public ResponseEntity<TopicoDto> cadastrar(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriBuilder) {
-		// Devolvemos um topicodto na corpo da resposta, que vai representar o conteúdo
-		// criado.
+
 		Topico topico = form.converter(cursoRepository);
 		topicoRepository.save(topico);
 
@@ -60,16 +59,10 @@ public class TopicosController {
 		return ResponseEntity.created(uri).body(new TopicoDto(topico));
 	}
 
-	@GetMapping("/{id}") // Específica o parâmetro que este método irá receber na URL
+	@GetMapping("/{id}")
 	public ResponseEntity<DetalhesDoTopicoDto> detalhar(@PathVariable Long id) {
-		/*
-		 * Por padrão o SPRING irá olhar o nome do parâmetro do método e da URL, caso
-		 * tenham o mesmo nome já irá associa-los automaticamente. (@PathVariable("id")
-		 * Long codigo) - Caso o nome da váriavel seja diferente do path. Método para
-		 * listar apenas um Tópico.
-		 */
 
-		Optional<Topico> topico = topicoRepository.findById(id); // repository irá buscar no banco, um por id.
+		Optional<Topico> topico = topicoRepository.findById(id);
 		if (topico.isPresent()) {
 			return ResponseEntity.ok(new DetalhesDoTopicoDto(topico.get()));
 		}

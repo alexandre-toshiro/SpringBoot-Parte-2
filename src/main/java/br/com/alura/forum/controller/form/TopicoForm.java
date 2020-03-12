@@ -9,14 +9,11 @@ import br.com.alura.forum.model.Curso;
 import br.com.alura.forum.model.Topico;
 import br.com.alura.forum.repository.CursoRepository;
 
-// DTO E FORM - Form são dados que chegam do cliente para a API.
 public class TopicoForm {
 
-	// Validação Bean do Spring. Colocar no Controller o @valid
-
-	@NotNull // Campo não pode ser nulo
-	@NotEmpty // não pode ser vazio
-	@Length(min = 5) // Mínimo de 5 caracteres
+	@NotNull
+	@NotEmpty
+	@Length(min = 5)
 	private String titulo;
 
 	@NotNull
