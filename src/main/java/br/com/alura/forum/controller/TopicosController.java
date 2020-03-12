@@ -2,7 +2,6 @@ package br.com.alura.forum.controller;
 
 
 import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,7 +44,7 @@ public class TopicosController {
 
 	@GetMapping
 	public Page<TopicoDto> lista(@RequestParam(required = false) String nomeCurso, @RequestParam int pagina,
-			@RequestParam int qtd) {
+			@RequestParam int qtd, @RequestParam String ordenacao) {
 		/*
 		 * @reqparam, fazm com que seja obrigatório a sua irnserção, colocaremos em
 		 * todos os parâmetros para que assim o usuário seja obrigado a informar uma
@@ -53,8 +53,10 @@ public class TopicosController {
 		 * CURSO é opcional, então atribuimos false no required.(por padrão é obrigatório)
 		 */
 
-		Pageable paginacao = PageRequest.of(pagina, qtd); // Responsável pela paginação.(Pageable)
+		Pageable paginacao = PageRequest.of(pagina, qtd, Direction.ASC, ordenacao); // Responsável pela paginação.(Pageable)
 		// para cria-lo precisamos do pagequest, onde iremos passar a página e a quantidade.
+		// Ordenação: passamos uma spring no paramatro e na paginacao informamos a direção, com o DIRECTION
+		// e dps passaos o parâmetro pelo qual será ordenado.
 		
 		if (nomeCurso == null) {
 			// passando o nosso pageable como parametro o spring já destecta que vamos fazer uma páginação
