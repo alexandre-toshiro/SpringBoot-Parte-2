@@ -29,7 +29,7 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
 		//tudo que for /topicos com o método get, será permitido a todos. (métod o, URL)
 		.antMatchers(HttpMethod.GET,"/topicos/*").permitAll()
 		.anyRequest().authenticated()// qualquer outra requisição precisa de autentificação.
-		.and().formLogin();
+		.and().formLogin();// Já cria um formulário do Spring.
 	}
 	
 	// Configurações de recursos estásticos(requisições para js, css, imagens, etc) 
@@ -37,7 +37,6 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
 	public void configure(WebSecurity web) throws Exception {
 		
 	}
-
 } 
 
 
