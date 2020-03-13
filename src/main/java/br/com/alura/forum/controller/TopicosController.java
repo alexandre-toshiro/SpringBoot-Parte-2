@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -70,6 +71,7 @@ public class TopicosController {
 
 	@PostMapping
 	@Transactional
+	@CacheEvict(value="listaDeTopicos", allEntries = true) // Limpa todos os cache referete ao listadetopicos, pois aqui estamos fazendo um novo cad.
 	public ResponseEntity<TopicoDto> cadastrar(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriBuilder) {
 
 		Topico topico = form.converter(cursoRepository);
@@ -92,6 +94,7 @@ public class TopicosController {
 
 	@PutMapping("/{id}")
 	@Transactional
+	@CacheEvict(value="listaDeTopicos", allEntries = true)
 	public ResponseEntity<TopicoDto> atualizar(@PathVariable Long id, @RequestBody @Valid AtualizacaoTopicoForm form) {
 
 		Optional<Topico> optional = topicoRepository.findById(id);
@@ -106,6 +109,7 @@ public class TopicosController {
 
 	@DeleteMapping("/{id}")
 	@Transactional
+	@CacheEvict(value="listaDeTopicos", allEntries = true)
 	public ResponseEntity<?> remover(@PathVariable Long id) {
 
 		Optional<Topico> optional = topicoRepository.findById(id);
@@ -116,4 +120,9 @@ public class TopicosController {
 
 		return ResponseEntity.notFound().build();
 	}
+	
+	/*@CacheEvicted - Toda vez que criamos, modificamos, ou deletamos, temos que invalidar o cache, pois
+	 * as informações que estavam ali agora foram alteradas, para que assim na próxima busca o spring não busque este cache
+	 * desatualizado, então nos métodos de alteração, devemos setar essa notação com value relacionado 
+	 * ao Cacheable setado.*/
 }
