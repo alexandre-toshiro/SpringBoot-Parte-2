@@ -1,6 +1,5 @@
 package br.com.alura.forum.controller;
 
-
 import java.net.URI;
 import java.util.Optional;
 
@@ -12,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,25 +43,21 @@ public class TopicosController {
 	private CursoRepository cursoRepository;
 
 	@GetMapping
-	public Page<TopicoDto> lista(@RequestParam(required = false) String nomeCurso, @RequestParam int pagina,
-			@RequestParam int qtd, @RequestParam String ordenacao) {
-		/*
-		 * @reqparam, fazm com que seja obrigatório a sua irnserção, colocaremos em
-		 * todos os parâmetros para que assim o usuário seja obrigado a informar uma
-		 * página e a quantidade de topicos que quer ver, para que a nossa aplicação não
-		 * carregue tudo de uma vez, ficando mto pesada e lenta. No caso do nome do
-		 * CURSO é opcional, então atribuimos false no required.(por padrão é obrigatório)
-		 */
+	public Page<TopicoDto> lista(@RequestParam(required = false) String nomeCurso, @PageableDefault(sort ="id", direction = Direction.DESC ) Pageable paginacao) {
+		// Ao invés de receber todos os parâmetros soltos aqui,passamos apenas o objetos
+		// pageable
+		// que já irá conter todos os parâmetros necessários a paginação, porém são
+		// todos em ingles
+		// e são nomes específicos para que o spring reconheça.
+		// Podemos setar a paginação padrão , caso o user não passe a ordem com o @PageableDefault.
 
-		Pageable paginacao = PageRequest.of(pagina, qtd, Direction.ASC, ordenacao); // Responsável pela paginação.(Pageable)
-		// para cria-lo precisamos do pagequest, onde iremos passar a página e a quantidade.
-		// Ordenação: passamos uma spring no paramatro e na paginacao informamos a direção, com o DIRECTION
-		// e dps passaos o parâmetro pelo qual será ordenado.
-		
 		if (nomeCurso == null) {
-			// passando o nosso pageable como parametro o spring já destecta que vamos fazer uma páginação
-			// Trocamos o List por pageable, pois o list sempre irá devolve todos os topicos.
-			// Dentro de page, também tem a lista e também o n de pag, pag atual, elementos, etc.
+			// passando o nosso pageable como parametro o spring já destecta que vamos fazer
+			// uma páginação
+			// Trocamos o List por pageable, pois o list sempre irá devolve todos os
+			// topicos.
+			// Dentro de page, também tem a lista e também o n de pag, pag atual, elementos,
+			// etc.
 			Page<Topico> topicos = topicoRepository.findAll(paginacao);
 			return TopicoDto.converter(topicos);
 		} else {
