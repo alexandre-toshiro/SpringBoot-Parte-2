@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @EnableWebSecurity // Habilita o security do spring
@@ -32,11 +32,15 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		
-		http.authorizeRequests().antMatchers(HttpMethod.GET, "/topicos").permitAll()
-		//tudo que for /topicos com o método get, será permitido a todos. (métod o, URL)
+		http.authorizeRequests()
+		.antMatchers(HttpMethod.GET, "/topicos").permitAll()//tudo que for /topicos com o método get, será permitido a todos. (métod o, URL)
 		.antMatchers(HttpMethod.GET,"/topicos/*").permitAll()
+		.antMatchers(HttpMethod.POST,"/auth").permitAll()
 		.anyRequest().authenticated()// qualquer outra requisição precisa de autentificação.
-		.and().formLogin();// Já cria um formulário do Spring.
+		.and().csrf().disable() // com o token a aplicação já está livre do ataque de csrf
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		// Informa ao spring que não é pr afazer autentificação(que fica em memória)
+		
 	}
 	
 	// Configurações de recursos estásticos(requisições para js, css, imagens, etc) 
