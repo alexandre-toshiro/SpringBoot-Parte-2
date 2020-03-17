@@ -13,7 +13,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Service
 public class TokenService {
 
-	@Value("${forum.jwt.expiration}")// Pega no application properties
+	@Value("${forum.jwt.expiration}")// Pega no application properties(injeção do properties)
 	private String expiration;
 	
 	@Value("${forum.jwt.secret}")// Pega no application properties
