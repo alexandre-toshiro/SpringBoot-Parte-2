@@ -10,7 +10,6 @@ public class TokenDto {
 		this.tipo = tipo;
 
 	}
-
 	public String getToken() {
 		return token;
 	}
@@ -18,5 +17,4 @@ public class TokenDto {
 	public String getTipo() {
 		return tipo;
 	}
-
 }

@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity // Habilita o security do spring
 @Configuration // Para o spring já carregar e ler as configurações no projeto ao ser inicializado.
@@ -46,8 +47,10 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
 		.antMatchers(HttpMethod.POST,"/auth").permitAll()
 		.anyRequest().authenticated()// qualquer outra requisição precisa de autentificação.
 		.and().csrf().disable() // com o token a aplicação já está livre do ataque de csrf
-		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		// Informa ao spring que não é pr afazer autentificação(que fica em memória)
+		.and().addFilterBefore(new AutenticacaoViaTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+		// adiciona o tokenfilter antes da autenticação padrão.
 		
 	}
 	
