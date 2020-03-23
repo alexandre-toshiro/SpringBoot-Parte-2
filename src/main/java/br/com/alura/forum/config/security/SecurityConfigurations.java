@@ -23,6 +23,9 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private AutentificacaoService autenticacaoService;
 	
+	@Autowired
+	private TokenService tokenService;
+	
 	@Override
 	@Bean
 	protected AuthenticationManager authenticationManager() throws Exception {
@@ -49,8 +52,8 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
 		.and().csrf().disable() // com o token a aplicação já está livre do ataque de csrf
 		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		// Informa ao spring que não é pr afazer autentificação(que fica em memória)
-		.and().addFilterBefore(new AutenticacaoViaTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-		// adiciona o tokenfilter antes da autenticação padrão.
+		.and().addFilterBefore(new AutenticacaoViaTokenFilter(tokenService), UsernamePasswordAuthenticationFilter.class);
+		// adiciona o tokenfilter antes da autenticação padrão. aqui o filtro é registrado no spring
 		
 	}
 	
