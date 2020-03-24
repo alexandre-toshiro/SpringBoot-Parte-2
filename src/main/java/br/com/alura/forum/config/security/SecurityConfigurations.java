@@ -14,6 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import br.com.alura.forum.repository.UsuarioRepository;
+
 @EnableWebSecurity // Habilita o security do spring
 @Configuration // Para o spring já carregar e ler as configurações no projeto ao ser inicializado.
 public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
@@ -25,6 +27,9 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
 	
 	@Autowired
 	private TokenService tokenService;
+	
+	@Autowired
+	private UsuarioRepository usuarioRepository;
 	
 	@Override
 	@Bean
@@ -48,11 +53,12 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter{
 		.antMatchers(HttpMethod.GET, "/topicos").permitAll()//tudo que for /topicos com o método get, será permitido a todos. (métod o, URL)
 		.antMatchers(HttpMethod.GET,"/topicos/*").permitAll()
 		.antMatchers(HttpMethod.POST,"/auth").permitAll()
+		.antMatchers(HttpMethod.GET,"/actuator/**").permitAll() // Não deixar aberto em produção.
 		.anyRequest().authenticated()// qualquer outra requisição precisa de autentificação.
 		.and().csrf().disable() // com o token a aplicação já está livre do ataque de csrf
 		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		// Informa ao spring que não é pr afazer autentificação(que fica em memória)
-		.and().addFilterBefore(new AutenticacaoViaTokenFilter(tokenService), UsernamePasswordAuthenticationFilter.class);
+		.and().addFilterBefore(new AutenticacaoViaTokenFilter(tokenService, usuarioRepository), UsernamePasswordAuthenticationFilter.class);
 		// adiciona o tokenfilter antes da autenticação padrão. aqui o filtro é registrado no spring
 		
 	}

@@ -7,17 +7,23 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import br.com.alura.forum.model.Usuario;
+import br.com.alura.forum.repository.UsuarioRepository;
 
 // Não podemos injetar aqui.A solução é passar no construtor, que obriga a passar o TokenService como par.
 public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
 	// Ondeper - Roda uma vez a cada req
 
 	private TokenService tokenService;
+	private UsuarioRepository usuarioRepository;
 
-	public AutenticacaoViaTokenFilter(TokenService tokenService) {
-		super();
+	public AutenticacaoViaTokenFilter(TokenService tokenService, UsuarioRepository usuarioRepository) {
 		this.tokenService = tokenService;
+		this.usuarioRepository = usuarioRepository;
 	}
 
 	@Override
@@ -27,10 +33,23 @@ public class AutenticacaoViaTokenFilter extends OncePerRequestFilter {
 
 		String token = recuperarToken(request);
 		boolean valido = tokenService.isTokenValid(token);
-		System.out.println(valido);
+		if (valido) {
+			autenticarCliente(token);
+		}
 
 		filterChain.doFilter(request, response);
 		// Após as ações necessárias, seguir o fluxo da requisição.
+
+	}
+
+	private void autenticarCliente(String token) {
+		Long idUsuario = tokenService.getIdUsuario(token);
+
+		Usuario usuario = usuarioRepository.findById(idUsuario).get();
+
+		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario, null,
+				usuario.getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 	}
 
